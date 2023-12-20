@@ -5,6 +5,7 @@ contract Assessment {
     address payable public owner;
     uint256 public balance;
 
+
     uint256 public economyTicketPrice = 10;
     uint256 public businessTicketPrice = 15;
 
