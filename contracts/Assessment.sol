@@ -1,26 +1,25 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-//import "hardhat/console.sol";
-
 contract Assessment {
     address payable public owner;
     uint256 public balance;
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);
+    event Reservation(address indexed user, uint256 numberOfPeople);
 
-    constructor(uint initBalance) payable {
+    constructor(uint256 initBalance) payable {
         owner = payable(msg.sender);
         balance = initBalance;
     }
 
-    function getBalance() public view returns(uint256){
+    function getBalance() public view returns (uint256) {
         return balance;
     }
 
     function deposit(uint256 _amount) public payable {
-        uint _previousBalance = balance;
+        uint256 _previousBalance = balance;
 
         // make sure this is the owner
         require(msg.sender == owner, "You are not the owner of this account");
@@ -40,12 +39,13 @@ contract Assessment {
 
     function withdraw(uint256 _withdrawAmount) public {
         require(msg.sender == owner, "You are not the owner of this account");
-        uint _previousBalance = balance;
+        uint256 _previousBalance = balance;
         if (balance < _withdrawAmount) {
-            revert InsufficientBalance({
-                balance: balance,
-                withdrawAmount: _withdrawAmount
-            });
+            revert
+                InsufficientBalance({
+                    balance: balance,
+                    withdrawAmount: _withdrawAmount
+                });
         }
 
         // withdraw the given amount
@@ -56,5 +56,16 @@ contract Assessment {
 
         // emit the event
         emit Withdraw(_withdrawAmount);
+    }
+
+    function makeReservation(uint256 numberOfPeople) public {
+        // ensure the sender has enough balance for the reservation
+        require(balance >= numberOfPeople * 2, "Insufficient balance for reservation");
+
+        // perform reservation
+        balance -= numberOfPeople * 2;
+
+        // emit the reservation event
+        emit Reservation(msg.sender, numberOfPeople);
     }
 }
